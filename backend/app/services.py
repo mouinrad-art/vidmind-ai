@@ -1,10 +1,10 @@
 import json
 from collections import defaultdict
-from youtube_transcript_api import YouTubeTranscriptApi
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
 from .core import settings, stamp
 from .store import vector_store
+from app.supadata_service import get_supadata_transcript
 
 VIDEO_REGISTRY = {}  # in-memory metadata; re-ingest videos after backend restart
 
@@ -14,9 +14,11 @@ def model():
         raise RuntimeError("OPENAI_API_KEY is not configured")
     return ChatOpenAI(model=cfg.openai_model, api_key=cfg.openai_api_key, temperature=0)
 
+
 def fetch_transcript(video_id: str):
-    api = YouTubeTranscriptApi()
-    return api.fetch(video_id).to_raw_data()
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+    return get_supadata_transcript(video_url)
+
 
 def ingest(video_id: str):
     segments = fetch_transcript(video_id)

@@ -5,13 +5,19 @@ import os
 import secrets
 import sqlite3
 import time
-from pathlib import Path
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(
+    Path(__file__).resolve().parent.parent / ".env"
+)
+
+JWT_SECRET = os.getenv("JWT_SECRET", "")
 
 DB_PATH = Path(os.getenv('AUTH_DB_PATH', './auth_data/users.sqlite3'))
-JWT_SECRET = os.getenv('JWT_SECRET', '')
 JWT_ALGORITHM = 'HS256'
 TOKEN_TTL = 60 * 60 * 24
 bearer = HTTPBearer(auto_error=False)
